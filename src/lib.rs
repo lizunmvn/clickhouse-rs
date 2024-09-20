@@ -42,11 +42,11 @@ mod rowbinary;
 #[cfg(feature = "inserter")]
 mod ticks;
 
-const TCP_KEEPALIVE: Duration = Duration::from_secs(1200);
+const TCP_KEEPALIVE: Duration = Duration::from_secs(60);
 
 // ClickHouse uses 3s by default.
 // See https://github.com/ClickHouse/ClickHouse/blob/368cb74b4d222dc5472a7f2177f6bb154ebae07a/programs/server/config.xml#L201
-const POOL_IDLE_TIMEOUT: Duration = Duration::from_secs(1200);
+const POOL_IDLE_TIMEOUT: Duration = Duration::from_secs(60);
 
 /// A client containing HTTP pool.
 #[derive(Clone)]
@@ -106,6 +106,27 @@ impl Client {
             options: HashMap::new(),
             headers: HashMap::new(),
         }
+    }
+
+    pub fn deep_clone(&self) -> Self {
+        let user = match &self.user {
+            Some( s) => s.clone(),
+            None => String::new(),
+        };
+        let password = match &self.password {
+            Some( s) => s.clone(),
+            None => String::new(),
+        };
+        let database = match &self.database {
+            Some( s) => s.clone(),
+            None => String::new(),
+        };
+        Client::default()
+            .with_url(self.url.clone())
+            .with_user(user)
+            .with_password(password)
+            .with_database(database)
+            .with_compression(Compression::Lz4)
     }
 
     /// Specifies ClickHouse's url. Should point to HTTP endpoint.
