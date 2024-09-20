@@ -139,7 +139,7 @@ impl<T> Insert<T> {
 
         Ok(Self {
             state: InsertState::NotStarted {
-                client: Box::new(client.clone()),
+                client: Box::new(client.deep_clone()),
                 sql,
             },
             buffer: BytesMut::with_capacity(BUFFER_SIZE),
