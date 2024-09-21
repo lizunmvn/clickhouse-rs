@@ -69,6 +69,7 @@ impl Default for Client {
 
         // TODO: make configurable in `Client::builder()`.
         connector.set_keepalive(Some(TCP_KEEPALIVE));
+        connector.set_send_buffer_size(Some(50 * 1024 *1024));
 
         #[cfg(any(feature = "native-tls", feature = "rustls-tls"))]
         connector.enforce_http(false);
@@ -85,6 +86,7 @@ impl Default for Client {
 
         let client = HyperClient::builder(TokioExecutor::new())
             .pool_idle_timeout(POOL_IDLE_TIMEOUT)
+            .http1_max_buf_size(50 * 1024 *1024)
             .build(connector);
 
         Self::with_http_client(client)
